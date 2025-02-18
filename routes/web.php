@@ -5,7 +5,6 @@
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\AdminController;
     use App\Http\Controllers\HomeController;
-    use App\Http\Controllers\ReservationController;
 
 
     Route::get('/', function () {
@@ -45,13 +44,6 @@
     })->name('home.facilities');
 
 
-  
-    Route::resource('reservations', ReservationController::class);
-
-Route::get('reservations/{reservation}/confirm', [ReservationController::class, 'confirm'])->name('reservations.confirm');
-Route::get('reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
-
-Route::get('/rooms/{room}/reserve', [ReservationController::class, 'create'])->name('reservations.create');
     
 
    
