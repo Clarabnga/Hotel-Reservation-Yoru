@@ -13,7 +13,7 @@
 <!-- Hero Section -->
 <div class="position-relative w-100" style="height: 550px;">
     <img src="{{ asset('assets/images/slide1.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Hero Image">
-    <a href="{{ url('/reservations') }}" class="btn btn-light large-btn shadow btn-rounded position-absolute top-50 start-50 translate-middle" data-mdb-ripple-init data-mdb-ripple-color="dark">
+    <a href="{{ url('/our-rooms') }}" class="btn btn-light large-btn shadow btn-rounded position-absolute top-50 start-50 translate-middle" data-mdb-ripple-init data-mdb-ripple-color="dark">
         Book Now
     </a>
     

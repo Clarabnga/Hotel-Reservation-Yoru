@@ -28,55 +28,25 @@
           <div class="collapse" id="emails">
             <ul class="nav sub-menu">
               <li class="nav-item">
-                <a href="pages/email/inbox.html" class="nav-link">Inbox</a>
+                <a href="#" class="nav-link">Inbox</a>
               </li>
               <li class="nav-item">
-                <a href="pages/email/read.html" class="nav-link">Read</a>
+                <a href="#" class="nav-link">Read</a>
               </li>
               <li class="nav-item">
-                <a href="pages/email/compose.html" class="nav-link">Compose</a>
+                <a href="#" class="nav-link">Compose</a>
               </li>
             </ul>
           </div>
         </li>
         <li class="nav-item">
-          <a href="pages/apps/calendar.html" class="nav-link">
+          <a href="{{route('admin.reservation')}}" class="nav-link">
             <i class="link-icon" data-feather="calendar"></i>
-            <span class="link-title">Calendar</span>
+            <span class="link-title">Reservation Data</span>
           </a>
         </li>
-        <li class="nav-item nav-category">Components</li>
-        <li class="nav-item">
-          <a class="nav-link"  data-bs-toggle="collapse" href="#charts" role="button" aria-expanded="false" aria-controls="charts">
-            <i class="link-icon" data-feather="pie-chart"></i>
-            <span class="link-title">Charts</span>
-            <i class="link-arrow" data-feather="chevron-down"></i>
-          </a>
-          <div class="collapse" id="charts">
-            <ul class="nav sub-menu">
-              <li class="nav-item">
-                <a href="pages/charts/chartjs.html" class="nav-link">ChartJs</a>
-              </li>
-            </ul>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="collapse" href="#tables" role="button" aria-expanded="false" aria-controls="tables">
-            <i class="link-icon" data-feather="layout"></i>
-            <span class="link-title">Table</span>
-            <i class="link-arrow" data-feather="chevron-down"></i>
-          </a>
-          <div class="collapse" id="tables">
-            <ul class="nav sub-menu">
-              <li class="nav-item">
-                <a href="pages/tables/basic-table.html" class="nav-link">Basic Tables</a>
-              </li>
-              <li class="nav-item">
-                <a href="pages/tables/data-table.html" class="nav-link">Data Table</a>
-              </li>
-            </ul>
-          </div>
-        </li>
+      
+      
         <li class="nav-item">
           <a class="nav-link" data-bs-toggle="collapse" href="#authPages" role="button" aria-expanded="false" aria-controls="authPages">
             <i class="link-icon" data-feather="unlock"></i>

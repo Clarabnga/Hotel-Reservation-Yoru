@@ -57,6 +57,8 @@
             	<!-- partial:partials/_footer.html -->
 			@include('home.body.footer')
 			<!-- partial -->
+
+			
 		
 		</div>
 	</div>
@@ -73,6 +75,7 @@
 	<!-- inject:js -->
 	<script src="{{ asset('assets/vendors/feather-icons/feather.min.js')}}"></script>
 	<script src="{{ asset('assets/js/template.js')}}"></script>
+
 	<!-- endinject -->
 
 	<!-- Custom js for this page -->

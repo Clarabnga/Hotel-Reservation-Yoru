@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Home;
 use Illuminate\Http\Request;
 use Auth;
+use App\Models\Room;
 
 class HomeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
+
+   
+     /* Display a listing of the resource.
      */
     public function HomeDashboard()
     {

@@ -8,6 +8,7 @@ use App\Models\User;
 use Hash;
 use Str;
 use App\Models\Room;
+use App\Models\Reservation;
 
 class AdminController extends Controller
 {
@@ -50,6 +51,30 @@ class AdminController extends Controller
 
     
 
+    }
+
+    public function AdminReservation(){
+        $reservations = Reservation::all();
+        return view('admin.reservationIndex', compact('reservations'));
+
+    }
+
+    public function UpdateReservation(Request $request, $id){
+        $reservation = Reservation::findOrFail($id);
+        $oldStatus = $reservation->status;
+        $reservation->update([
+            'status' => $request->status
+        ]);
+        if ($reservation->status == 'confirmed'){
+            $reservation->room->update(['status' => 'booked']);
+        }
+
+        if($oldStatus == 'confirmed' && $reservation->status == 'cancelled'){
+            $reservation->room->update(['status' => 'available']);
+        }
+        
+
+        return redirect()->route('admin.reservation')->with('success', 'Reservation update success');
     }
 
     

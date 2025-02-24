@@ -4,6 +4,7 @@
     use App\Http\Controllers\RoomController;
     use Illuminate\Support\Facades\Route;
     use App\Http\Controllers\AdminController;
+    use App\Http\Controllers\ReservationController;
     use App\Http\Controllers\HomeController;
 
 
@@ -11,8 +12,8 @@
         return view('home.welcome');
     });
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');})->middleware(['auth', 'verified'])->name('dashboard');
+    Route::get('/home/dashboard', function () {
+        return view('home.dashboard');})->middleware(['auth', 'verified'])->name('DASHBOARD');
 
 
     Route::middleware('auth')->group(function () {
@@ -29,6 +30,8 @@
     Route::get('/admin/profile', [AdminController::class, 'AdminProfile']);
     Route::post('profile/update', [AdminController::class, 'AdminProfileUpdate']);
     Route::resource('/admin/rooms', RoomController::class)->names('rooms');
+    Route::get('/admin/reservations', [AdminController::class, 'AdminReservation'])->name('admin.reservation');
+    Route::post('admin/updateReservation/{id}', [AdminController::class, 'UpdateReservation'])->name('update.reservation');
     });
 
 
@@ -43,14 +46,16 @@
         return view('home.facilities');
     })->name('home.facilities');
 
-
-    
-
-   
-
     Route::get('/our-rooms', [RoomController::class, 'OurRooms'])-> name('our.room');
 
 
 
 
+    Route::middleware('auth')->group(function() {
+        Route::get('/receipt/{id}', [ReservationController::class, 'showReceipt'])->name('receipt');
+        Route::get('/booking/{id}', [ReservationController::class, 'bookingForm'])->name('booking.form');
+        Route::post('/booking', [ReservationController::class,'store'])->name('booking.store');
 
+
+    });
+    
