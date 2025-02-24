@@ -114,18 +114,19 @@ class RoomController extends Controller
 
     public function OurRooms()
     {
-        $rooms = Room::select('type', 'image', 'facilities', 'price')
-            ->whereIn('id', function($query) {
-                $query->select(DB::raw('min(id)'))
+        $rooms = Room::select('id', 'facilities', 'type', 'image', 'price')
+            ->whereIn('id', function ($query) {
+                $query->select(DB::raw('MIN(id)'))
                     ->from('rooms')
                     ->groupBy('type');
             })
             ->get();
+            
     
         return view('home.rooms', compact('rooms'));
     }
     
-    //
-
+    
+    
     //
 }
