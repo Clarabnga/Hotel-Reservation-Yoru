@@ -3,9 +3,11 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Room;
 
 class RoomFactory extends Factory
 {
+    protected $model = Room::class;
         public function definition(): array
         {
             // Pilih tipe kamar secara acak

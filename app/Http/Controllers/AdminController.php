@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-use Hash;
+use Illuminate\Support\Facades\Hash;
 use Str;
 use App\Models\Room;
 use App\Models\Reservation;
@@ -48,9 +48,6 @@ class AdminController extends Controller
         $user->save(); 
 
         return redirect('admin/profile')->with('success','update success');
-
-    
-
     }
 
     public function AdminReservation(){

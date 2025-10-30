@@ -64,6 +64,12 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
+        'watchdog' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/watchdog.log'),
+            'level' => 'info',
+            'replace_placeholders' => true,
+        ],
 
         'daily' => [
             'driver' => 'daily',

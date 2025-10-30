@@ -6,7 +6,13 @@ use App\Mail\ReservationReceiptMail;
 use App\Models\Reservation;
 use App\Models\Room;
 use Illuminate\Http\Request;
-use Mail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
+use App\Services\ReservationService;
+use App\Jobs\sendEmailJob;
+use Illuminate\Support\Facades\Log;
+use App\Models\PriorityQueue;
+use App\Models\User;
 
 class ReservationController extends Controller
 {
@@ -35,6 +41,7 @@ class ReservationController extends Controller
             'phone' => 'required|string|max:15',
             'check_in' => 'required|date|after_or_equal:today',
             'check_out' => 'required|date|after:check_in',
+        ],[
         ]);
     
         // Cek apakah kamar yang dipilih sudah dibooking pada tanggal tersebut
@@ -67,8 +74,6 @@ class ReservationController extends Controller
     
         // Ambil data kamar
         $room = Room::findOrFail($request->room_id);
-    
-        // Hitung total harga
         $totalDays = (strtotime($validated['check_out']) - strtotime($validated['check_in'])) / 86400;
         $totalPrice = $totalDays * $room->price;
     
@@ -83,7 +88,21 @@ class ReservationController extends Controller
             'total_price' => $totalPrice,
             'status' => 'pending',
         ]);
-    
+
+        $user = Auth::user();
+        $role = $user->role ?? 'regular';
+        $priority = ['vvip' => 1, 'vip' => 2, 'regular' => 3];
+        for($i = 0; $i < 4; $i++){
+        PriorityQueue::create([
+            'priority' => $priority[$role],
+            'job_class' => \App\Jobs\sendEmailJob::class,
+            'payload' => json_encode([
+                'reservation_id' => $reservation->id,
+            ]),
+        ]);
+        Log::channel('watchdog')->info("queue email for reservation {$reservation['name']} (id: {$reservation->id})");
+    }
+
         // Cek apakah semua kamar dari tipe ini sudah penuh dalam bulan ini
         $fullyBookedRooms = Room::where('type', $room->type)->get()->filter(function ($room) use ($validated) {
             return $room->isRoomBookedForMonth(date('Y', strtotime($validated['check_in'])), date('m', strtotime($validated['check_in'])));
@@ -94,14 +113,13 @@ class ReservationController extends Controller
         }
     
         // Kirim email
-        Mail::to($validated['email'])->send(new ReservationReceiptMail($reservation));
-    
         return redirect()->route('receipt', ['id' => $reservation->id])->with('success', 'Reservation Success! Wait for Confirmation.');
+    
     }
-    
 
     
 
+    
     /**
      * Display the specified resource.
      */
@@ -133,7 +151,7 @@ class ReservationController extends Controller
     {
         //
     }
-
+    
     public function bookingForm($id){
         $room = Room::findOrFail($id);
         return view('reservation.booking', compact('room'));
@@ -148,14 +166,14 @@ class ReservationController extends Controller
             return redirect()->route('home')->with('error', 'Reservation not found.');
         }
     
-        if (auth()->user()->email !== $reservation->email) {
-            abort(403, 'Access denied');
-        }
+        // if (Auth::user()->email !== $reservation->email) {
+        //     abort(403, 'Access denied');
+        // }
     
         return view('reservation.receipt', compact('reservation'));
     }
-    
 
+    
     // public function UserReceipt(){
     //     $reservation = Reservation::where('email', auth()->user()->email)->get();
     //     return view('reservation.receipt', compact('reservation'));

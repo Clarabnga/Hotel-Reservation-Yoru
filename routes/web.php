@@ -6,7 +6,7 @@
     use App\Http\Controllers\AdminController;
     use App\Http\Controllers\ReservationController;
     use App\Http\Controllers\HomeController;
-
+use App\Http\Controllers\WatchDog;
 
     Route::get('/', function () {
         return view('home.welcome');
@@ -58,4 +58,6 @@
 
 
     });
+
+    Route::get('test-queue', [WatchDog::class, 'testQueue'])->name('test-queue');
     
