@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
 
     if ($request->user()->role == 'admin') {
         return redirect()->intended(route('admin.dashboard'));
-    } elseif ($request->user()->role == 'user') {
+    } elseif (in_array($request->user()->role, ['regular', 'vvip', 'vip'])) {
         return redirect()->intended(route('home.dashboard', absolute:false));
     }
 

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->date('check_out');
             $table->integer('total_price');
             $table->enum('status', ['confirmed', 'pending', 'cancelled'])->default('pending');
+            
         });
     }
 

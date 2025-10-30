@@ -5,7 +5,16 @@
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body bg-secondary">
-
+                @if (session('success'))
+                <div class="alert alert-success" role="alert">
+                    {{ session('success') }}
+                    </div>
+                @endif
+                @if (session('error'))
+                <div class="alert alert-danger" role="alert">
+                    {{ session('error') }}
+                    </div>
+                @endif
                 <form class="forms-sample" action="{{url('/booking')}}" method="post">
                     @csrf
 

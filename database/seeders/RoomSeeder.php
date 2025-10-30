@@ -14,7 +14,7 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
         Room::insert([
-            'number' => '002',
+            'number' => '000',
             'type' => 'Deluxe',
             'price' => 500000,
             'facilities' => 'AC, TV, Wifi',
