@@ -44,6 +44,10 @@
             <i class="link-icon" data-feather="calendar"></i>
             <span class="link-title">Reservation Data</span>
           </a>
+          <a href="{{ route('admin.watchdog.index') }}" class="nav-link">
+            <i class="link-icon" data-feather="activity"></i>
+            <span class="link-title">Watchdog</span>
+          </a>
         </li>
       
       

@@ -14,11 +14,19 @@
           <li class="nav-item nav-category">Main</li>
 
           <li class="nav-item">
-            <a href="{{route('home.dashboard')}}" class="nav-link">
+            <a href="{{ route('dashboard') }}" class="nav-link">
               <i class="link-icon" data-feather="box"></i>
               <span class="link-title">Dashboard</span>
             </a>
           </li>
+          @auth
+          <li class="nav-item">
+            <a href="{{ route('reservations.index') }}" class="nav-link">
+              <i class="link-icon" data-feather="calendar"></i>
+              <span class="link-title">My Reservations</span>
+            </a>
+          </li>
+          @endauth
           <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#emails" role="button" aria-expanded="false" aria-controls="emails">
               <i class="link-icon" data-feather="mail"></i>
@@ -39,21 +47,23 @@
             </a>
           </li>
 
-          @php
-          $userReservation = \App\Models\Reservation::where('email', auth()->user()->email ?? null)
-              ->whereIn('status', [ 'pending', 'confirmed', 'cancel'])
-              ->latest()
-              ->first();
-      @endphp
-      
-      @if ($userReservation)
+      @auth
+        @php
+          $userReservation = auth()->user()->reservations()
+            ->whereIn('status', ['pending', 'confirmed', 'cancelled'])
+            ->latest()
+            ->first();
+        @endphp
+
+        @if ($userReservation)
           <li class="nav-item">
               <a class="nav-link" href="{{ url('/receipt/' . $userReservation->id) }}">
                   <i class="link-icon" data-feather="layout"></i>
                   <span class="link-title">Your Receipt</span>
               </a>
           </li>
-      @endif
+        @endif
+      @endauth
       
           <li class="nav-item">
             <a class="nav-link" data-bs-toggle="collapse" href="#authPages" role="button" aria-expanded="false" aria-controls="authPages">

@@ -77,14 +77,13 @@
             </table>
     
             <div class="text-center mt-4">
-                <a href="{{ url('/dashboard') }}" class="btn btn-dark">Back</a>
+                <a href="{{ route('dashboard') }}" class="btn btn-dark">Back</a>
             </div>
         </div>
     </div>
     
 </body>
 </html>
-
 
 
 

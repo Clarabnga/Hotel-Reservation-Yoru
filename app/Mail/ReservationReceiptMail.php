@@ -3,12 +3,11 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use SebastianBergmann\CodeUnit\FunctionUnit;
 
 class ReservationReceiptMail extends Mailable
 {
@@ -24,27 +23,28 @@ class ReservationReceiptMail extends Mailable
     }
 
     public $reservation;
-    public function build(){
+
+    public function build()
+    {
         return $this->from(env('MAIL_FROM_ADDRESS'), 'Yoru Hotel')
-        ->subject('Reservation Receipt')
-        ->view('reservation.emailReceipt')
-        ->with(['reservation' => $this->reservation]);
-    
+            ->subject('Reservation Receipt')
+            ->view('reservation.emailReceipt')
+            ->with(['reservation' => $this->reservation]);
+
     }
 
     /**
      * Get the message envelope.
      */
-   
 
     /**
      * Get the message content definition.
      */
-   
+
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array<int, Attachment>
      */
     public function attachments(): array
     {

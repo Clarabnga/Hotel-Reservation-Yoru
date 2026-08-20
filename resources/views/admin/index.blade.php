@@ -40,7 +40,7 @@
                 <td>{{ $room->type }}</td>
                 <td>{{ $room->formatted_price }}</td>
                 <td class="facilities-column">{{ $room->facilities }}</td>
-                <td>{{ $room->status }} </td>
+                <td>{{ ucfirst($room->operational_status) }}</td>
                 <td>
                   <div class="d-flex gap-2">
                     <a href="{{ route('rooms.edit', $room->id) }}" class="btn btn-light">Edit</a>

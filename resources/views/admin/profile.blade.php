@@ -9,7 +9,7 @@
 
                 <h6 class="card-title">Profie Update</h6>
 
-                <form class="forms-sample" action="{{url('profile/update')}}" method="post">
+                <form class="forms-sample" action="{{ route('admin.profile.update') }}" method="post">
                     <div class="mb-3">
                         {{csrf_field()}}
                         <label class="form-label">Name</label>
@@ -30,6 +30,8 @@
                         <label class="form-label">Password</label>
                         <input type="password" class="form-control"
                             placeholder="Password" name="password">
+                        <input type="password" class="form-control mt-2"
+                            placeholder="Confirm Password" name="password_confirmation">
                     </div>
                     leave blank if u're not changing
 

@@ -78,6 +78,8 @@
                 <span class="badge bg-success text-dark">Confirmed</span>
                 @elseif($reservation->status == 'cancelled')
                 <span class="badge bg-danger text-dark">Cancelled</span>
+                @elseif($reservation->status == 'completed')
+                <span class="badge bg-info text-dark">Completed</span>
                 @endif
             </h5>
             </div>
@@ -85,7 +87,7 @@
         </table>
 
         <div class="text-center mt-4">
-            <a href="{{ url('/home/dashboard') }}" class="btn btn-dark">Back</a>
+            <a href="{{ route('dashboard') }}" class="btn btn-dark">Back</a>
         </div>
     </div>
 </div>

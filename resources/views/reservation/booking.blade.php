@@ -20,16 +20,12 @@
 
                     <input type="hidden" name="room_id" value="{{$room->id}}">
                     <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" placeholder="Full Name" name="name" required>
+                        <label class="form-label">Account</label>
+                        <input type="text" class="form-control" value="{{ auth()->user()->name }} ({{ auth()->user()->email }})" disabled>
                     </div>
                     <div class="mb-3">
                         <label for="phone" class="form-label">Phone</label>
-                        <input type="tel" class="form-control" placeholder="Phone" name="phone"required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control" name="email" placeholder="Email" required>
+                        <input type="tel" class="form-control" placeholder="Phone" name="phone" value="{{ old('phone', auth()->user()->phone) }}" required>
                     </div>
                     <div class="row">
                         <div class="col-md-6">

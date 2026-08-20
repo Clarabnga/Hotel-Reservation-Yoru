@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\FakeJob;
 use App\Models\PriorityQueue;
 use App\Models\Reservation;
 use Illuminate\Console\Command;
@@ -9,6 +10,7 @@ use Illuminate\Console\Command;
 class seedFakeJobs extends Command
 {
     protected $signature = 'seed:fake-jobs';
+
     protected $description = 'Seed dummy jobs for priority queue testing';
 
     public function handle()
@@ -24,10 +26,10 @@ class seedFakeJobs extends Command
             $priority = $rolePriority[$role];
 
             PriorityQueue::create([
-                'job_class' => \App\Jobs\FakeJob::class,
+                'job_class' => FakeJob::class,
                 'payload' => json_encode([
                     'reservation_id' => $reservation->id,
-                    'priority_id' => PriorityQueue::find('priority') 
+                    'priority_id' => PriorityQueue::find('priority'),
                 ]),
                 'priority' => $priority,
                 'cut_count' => 0,
@@ -36,6 +38,6 @@ class seedFakeJobs extends Command
             ]);
         }
 
-        $this->info("Seeded: " . $reservations->count() . " fake jobs.");
+        $this->info('Seeded: '.$reservations->count().' fake jobs.');
     }
 }

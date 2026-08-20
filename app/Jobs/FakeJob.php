@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Log;
 class FakeJob implements ShouldQueue
 {
     use Queueable;
+
     public $tries = 5;
+
     public $backoff = 2;
 
     /**
@@ -26,19 +28,15 @@ class FakeJob implements ShouldQueue
     /**
      * Execute the job.
      */
-   public function handle(): void
-{
-    Log::channel('watchdog')->info("running fake job for reservationr id {$this->reservation->id}");
+    public function handle(): void
+    {
+        Log::channel('watchdog')->info("running fake job for reservationr id {$this->reservation->id}");
 
-    if (rand(1, 100) <= 70) {
-        Log::channel('watchdog')->warning("fake job {$this->reservation->id} failed on purpose");
-        throw new Exception("fake job {$this->reservation->id} failed on purpose");
+        if (rand(1, 100) <= 70) {
+            Log::channel('watchdog')->warning("fake job {$this->reservation->id} failed on purpose");
+            throw new Exception("fake job {$this->reservation->id} failed on purpose");
+        }
+
+        Log::channel('watchdog')->info("fake job {$this->reservation->id} completed successfully");
     }
-
-    Log::channel('watchdog')->info("fake job {$this->reservation->id} completed successfully");
 }
-
-
-
-}
-

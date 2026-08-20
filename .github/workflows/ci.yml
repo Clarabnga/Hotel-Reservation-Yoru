@@ -1,0 +1,47 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  sqlite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.5', extensions: 'mbstring, pdo_sqlite', coverage: none}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: composer validate --strict
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: npm ci
+      - run: npm run build
+      - run: cp .env.example .env && php artisan key:generate
+      - run: php artisan test --exclude-group postgres
+      - run: vendor/bin/pint --test app routes database tests
+      - run: git diff --exit-code
+  postgres-integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env: {POSTGRES_DB: yoru_test, POSTGRES_USER: yoru, POSTGRES_PASSWORD: yoru_test_password}
+        ports: ['5432:5432']
+        options: --health-cmd="pg_isready -U yoru -d yoru_test" --health-interval=5s --health-timeout=5s --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:9JpKpNqFYpP2qcxLJyUxjfMKX9O5Drr9MLYqlnRFkPw=
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: yoru_test
+      DB_USERNAME: yoru
+      DB_PASSWORD: yoru_test_password
+      DB_SSLMODE: disable
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with: {php-version: '8.5', extensions: 'mbstring, pdo_pgsql', coverage: none}
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: php artisan test tests/Integration/PostgresBookingLockTest.php

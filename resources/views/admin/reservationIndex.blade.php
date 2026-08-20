@@ -3,6 +3,18 @@
 @section('admin')
 
 <div class="container-fluid mt-5 mb-5"> 
+    <form method="GET" action="{{ route('admin.reservation') }}" class="row g-2 mb-3">
+        <div class="col-md-6"><input name="search" value="{{ request('search') }}" class="form-control" placeholder="Search customer, email, or room type"></div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">All statuses</option>
+                @foreach (['pending', 'confirmed', 'cancelled', 'completed'] as $status)
+                    <option value="{{ $status }}" @selected(request('status') === $status)>{{ ucfirst($status) }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-3"><button class="btn btn-secondary" type="submit">Filter</button></div>
+    </form>
     
     <div class="table-responsive"> 
         <table class="table mb-5">
@@ -31,6 +43,7 @@
                         @if ($reservation->status == 'pending') bg-warning
                         @elseif($reservation->status == 'confirmed') bg-success
                         @elseif($reservation->status == 'cancelled') bg-danger
+                        @elseif($reservation->status == 'completed') bg-info
                         @endif">
                         {{ ucfirst($reservation->status) }} 
                         </span>
@@ -42,6 +55,7 @@
                                 <option value="pending" {{ $reservation->status == 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option value="confirmed" {{ $reservation->status == 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                                 <option value="cancelled" {{ $reservation->status == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                <option value="completed" {{ $reservation->status == 'completed' ? 'selected' : '' }}>Completed</option>
                             </select>
                             <button type="submit" class="btn btn-secondary btn-sm">Update</button>
                         </form>
@@ -54,6 +68,8 @@
             </tbody>
         </table>
     </div>
+
+    {{ $reservations->links() }}
 
 </div>
 

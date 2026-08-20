@@ -51,4 +51,29 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_regular_users_can_access_the_customer_dashboard(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->get('/dashboard')->assertOk();
+    }
+
+    public function test_admin_users_are_redirected_to_the_admin_dashboard(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->get('/dashboard')
+            ->assertRedirect(route('admin.dashboard'));
+    }
+
+    public function test_regular_users_cannot_access_the_admin_dashboard(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->get('/admin/dashboard')
+            ->assertRedirect('/dashboard');
+    }
 }

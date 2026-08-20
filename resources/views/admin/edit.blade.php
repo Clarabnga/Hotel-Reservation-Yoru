@@ -5,7 +5,7 @@
         <div class="card">
             <div class="card-body">
                 <h1 class="card-title">Update Room</h1>
-                <form action="{{ route('rooms.update', $room->id) }}" method="POST"> <!-- Fixed route -->
+                <form action="{{ route('rooms.update', $room->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT') <!-- Fixed method -->
                     
@@ -30,10 +30,11 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <select name="status" id="status" class="form-select" required>
-                            <option value="available" {{ $room->status == 'available' ? 'selected' : '' }}>Available</option>
-                            <option value="booked" {{ $room->status == 'booked' ? 'selected' : '' }}>Booked</option>
+                        <label class="form-label">Operational Status</label>
+                        <select name="operational_status" id="operational_status" class="form-select" required>
+                            @foreach (['active', 'inactive', 'maintenance'] as $status)
+                                <option value="{{ $status }}" @selected($room->operational_status === $status)>{{ ucfirst($status) }}</option>
+                            @endforeach
                         </select>
                     </div>
 
