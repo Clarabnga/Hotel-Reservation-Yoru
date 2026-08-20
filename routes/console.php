@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('watchdog:dispatch')->everySecond();
+Schedule::command('watchdog:dispatch')->everyMinute()->withoutOverlapping();
 // Schedule::command('retry:failed-jobs')->everyThirtySeconds();

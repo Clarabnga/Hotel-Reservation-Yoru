@@ -2,14 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\PriorityQueue;
-use App\Models\Reservation;
-use App\Models\User;
 use App\Models\Room;
-
+use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,13 +16,9 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(UserSeeder::class);
         $this->call(RoomSeeder::class);
-        
-        
-
 
         User::factory(30)->create();
         Room::factory(150)->create();
-       
 
         // User::factory()->create([
         //     'name' => 'Test User',

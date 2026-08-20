@@ -4,29 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Home;
 use Illuminate\Http\Request;
-use Auth;
-use App\Models\Room;
 
 class HomeController extends Controller
 {
-
-   
-     /* Display a listing of the resource.
-     */
+    /* Display a listing of the resource.
+    */
     public function HomeDashboard()
     {
-        return view("home.welcome");
+        return view('home.welcome');
         //
-    }
-
-    public function HomeLogout(Request $request){
-        Auth::guard('web')->logout();
-        $request->session()->invalidate();
-        $request->session()->regenerate();
-
-        return redirect('/');
-
-        
     }
 
     /**

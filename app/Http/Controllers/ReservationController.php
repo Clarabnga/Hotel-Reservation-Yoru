@@ -2,24 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ReservationReceiptMail;
+use App\Exceptions\NoAvailableRoomException;
+use App\Http\Requests\StoreReservationRequest;
 use App\Models\Reservation;
 use App\Models\Room;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
-use App\Services\ReservationService;
-use App\Jobs\sendEmailJob;
-use Illuminate\Support\Facades\Log;
-use App\Models\PriorityQueue;
 use App\Models\User;
+use App\Services\ReservationBookingService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class ReservationController extends Controller
 {
+    public function index(Request $request)
+    {
+        $reservations = $request->user()
+            ->reservations()
+            ->with('room')
+            ->latest('check_in')
+            ->get();
+
+        return view('reservation.index', [
+            'upcomingReservations' => $reservations->whereIn('status', ['pending', 'confirmed'])
+                ->where('check_out', '>=', now()->toDateString()),
+            'pastReservations' => $reservations->whereIn('status', ['confirmed', 'completed'])
+                ->where('check_out', '<', now()->toDateString()),
+            'cancelledReservations' => $reservations->where('status', 'cancelled'),
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      */
-    
 
     /**
      * Show the form for creating a new resource.
@@ -32,98 +47,27 @@ class ReservationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreReservationRequest $request, ReservationBookingService $bookingService)
     {
-        $validated = $request->validate([
-            'room_id' => 'required|exists:rooms,id',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'phone' => 'required|string|max:15',
-            'check_in' => 'required|date|after_or_equal:today',
-            'check_out' => 'required|date|after:check_in',
-        ],[
-        ]);
-    
-        // Cek apakah kamar yang dipilih sudah dibooking pada tanggal tersebut
-        $isBooked = Reservation::where('room_id', $request->room_id)
-            ->where(function ($query) use ($request) {
-                $query->whereBetween('check_in', [$request->check_in, $request->check_out])
-                      ->orWhereBetween('check_out', [$request->check_in, $request->check_out]);
-            })
-            ->exists();
-    
-        if ($isBooked) {
-            // Cari kamar lain dengan tipe yang sama yang masih tersedia
-            $roomType = Room::where('id', $request->room_id)->value('type'); // Ambil tipe kamar
-            $alternativeRoom = Room::where('type', $roomType)
-                ->whereNotIn('id', function ($query) use ($request) {
-                    $query->select('room_id')
-                          ->from('reservations')
-                          ->whereBetween('check_in', [$request->check_in, $request->check_out])
-                          ->orWhereBetween('check_out', [$request->check_in, $request->check_out]);
-                })
-                ->first();
-    
-            if (!$alternativeRoom) {
-                return back()->with('error', 'No available rooms of this type for the selected dates.');
-            }
-    
-            // Ganti room_id dengan kamar alternatif yang tersedia
-            $request->merge(['room_id' => $alternativeRoom->id]);
-        }
-    
-        // Ambil data kamar
-        $room = Room::findOrFail($request->room_id);
-        $totalDays = (strtotime($validated['check_out']) - strtotime($validated['check_in'])) / 86400;
-        $totalPrice = $totalDays * $room->price;
-    
-        // Simpan reservasi ke database
-        $reservation = Reservation::create([
-            'room_id' => $room->id,
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-            'check_in' => $validated['check_in'],
-            'check_out' => $validated['check_out'],
-            'total_price' => $totalPrice,
-            'status' => 'pending',
-        ]);
+        $validated = $request->validated();
+        $user = $request->user();
+        $requestedRoom = Room::findOrFail($validated['room_id']);
 
-        $user = Auth::user();
-        $role = $user->role ?? 'regular';
-        $priority = ['vvip' => 1, 'vip' => 2, 'regular' => 3];
-        for($i = 0; $i < 4; $i++){
-        PriorityQueue::create([
-            'priority' => $priority[$role],
-            'job_class' => \App\Jobs\sendEmailJob::class,
-            'payload' => json_encode([
-                'reservation_id' => $reservation->id,
-            ]),
-        ]);
-        Log::channel('watchdog')->info("queue email for reservation {$reservation['name']} (id: {$reservation->id})");
-    }
-
-        // Cek apakah semua kamar dari tipe ini sudah penuh dalam bulan ini
-        $fullyBookedRooms = Room::where('type', $room->type)->get()->filter(function ($room) use ($validated) {
-            return $room->isRoomBookedForMonth(date('Y', strtotime($validated['check_in'])), date('m', strtotime($validated['check_in'])));
-        });
-    
-        if ($fullyBookedRooms->count() >= Room::where('type', $room->type)->count()) {
-            Room::where('type', $room->type)->update(['status' => 'booked']);
+        try {
+            $reservation = $bookingService->book($user, $requestedRoom, $validated);
+        } catch (NoAvailableRoomException $exception) {
+            return back()->withInput()->with('error', $exception->getMessage());
         }
-    
+
         // Kirim email
-        return redirect()->route('receipt', ['id' => $reservation->id])->with('success', 'Reservation Success! Wait for Confirmation.');
-    
+        return redirect()->route('receipt', $reservation)->with('success', 'Reservation Success! Wait for Confirmation.');
+
     }
 
-    
-
-    
     /**
      * Display the specified resource.
      */
-    public function show( $reservation)
+    public function show($reservation)
     {
         //
     }
@@ -131,7 +75,7 @@ class ReservationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit( $reservation)
+    public function edit($reservation)
     {
         //
     }
@@ -139,7 +83,7 @@ class ReservationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request,  $reservation)
+    public function update(Request $request, $reservation)
     {
         //
     }
@@ -147,33 +91,40 @@ class ReservationController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy( $reservation)
+    public function destroy($reservation)
     {
         //
     }
-    
-    public function bookingForm($id){
-        $room = Room::findOrFail($id);
+
+    public function bookingForm($id)
+    {
+        $room = Room::active()->findOrFail($id);
+
         return view('reservation.booking', compact('room'));
 
     }
 
-    public function showReceipt($id)
+    public function showReceipt(Reservation $reservation)
     {
-        $reservation = Reservation::with('room')->find($id);
-    
-        if (!$reservation) {
-            return redirect()->route('home')->with('error', 'Reservation not found.');
-        }
-    
-        // if (Auth::user()->email !== $reservation->email) {
-        //     abort(403, 'Access denied');
-        // }
-    
+        Gate::authorize('view', $reservation);
+        $reservation->load('room');
+
         return view('reservation.receipt', compact('reservation'));
     }
 
-    
+    public function cancel(Reservation $reservation)
+    {
+        Gate::authorize('cancel', $reservation);
+
+        DB::transaction(function () use ($reservation): void {
+            $lockedReservation = Reservation::whereKey($reservation->id)->lockForUpdate()->firstOrFail();
+            Gate::authorize('cancel', $lockedReservation);
+            $lockedReservation->update(['status' => 'cancelled']);
+        });
+
+        return redirect()->route('reservations.index')->with('success', 'Reservation cancelled.');
+    }
+
     // public function UserReceipt(){
     //     $reservation = Reservation::where('email', auth()->user()->email)->get();
     //     return view('reservation.receipt', compact('reservation'));

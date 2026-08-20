@@ -43,9 +43,12 @@
                       </a>
                   </li>
                   <li>
-                      <a class="dropdown-item text-danger" href="{{route('home.logout')}}">
-                          <i class="me-2 icon-md" data-feather="log-out"></i> Log Out
-                      </a>
+                      <form method="POST" action="{{ route('logout') }}">
+                          @csrf
+                          <button type="submit" class="dropdown-item text-danger">
+                              <i class="me-2 icon-md" data-feather="log-out"></i> Log Out
+                          </button>
+                      </form>
                   </li>
               </ul>
           </div>

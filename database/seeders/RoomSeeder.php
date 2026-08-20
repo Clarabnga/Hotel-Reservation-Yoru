@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Room;
+use Illuminate\Database\Seeder;
 
 class RoomSeeder extends Seeder
 {
@@ -18,7 +17,7 @@ class RoomSeeder extends Seeder
             'type' => 'Deluxe',
             'price' => 500000,
             'facilities' => 'AC, TV, Wifi',
-            'status' => 'available'
+            'status' => 'available',
         ]);
 
         //

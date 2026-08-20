@@ -28,10 +28,11 @@
                     </div>
 
                     <div class="m-3">
-                        <label for="status" class="form-label">Status</label>
-                        <select name="status" id="status" class="form-select" required>
-                            <option value="available">Available</option>
-                            <option value="booked">Booked</option>
+                        <label for="operational_status" class="form-label">Operational Status</label>
+                        <select name="operational_status" id="operational_status" class="form-select" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="maintenance">Maintenance</option>
                         </select>
                     </div>
 
@@ -47,5 +48,4 @@
     </div>
 </div>
 @endsection
-
 
