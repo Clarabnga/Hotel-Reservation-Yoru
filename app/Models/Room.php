@@ -14,7 +14,12 @@ class Room extends Model
 
     protected $maxReservationsPerMonth = 20;
 
-    protected $fillable = ['id', 'number', 'type', 'price', 'facilities', 'status', 'operational_status', 'image'];
+    protected $fillable = ['id', 'room_type_id', 'number', 'type', 'price', 'facilities', 'status', 'operational_status', 'image'];
+
+    public function roomType()
+    {
+        return $this->belongsTo(RoomType::class);
+    }
 
     public function getFormattedNumberAttribute()
     {

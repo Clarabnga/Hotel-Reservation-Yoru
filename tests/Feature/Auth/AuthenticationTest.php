@@ -52,6 +52,13 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect('/');
     }
 
+    public function test_authenticated_header_exposes_csrf_protected_logout(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user)->get(route('profile.edit'))
+            ->assertOk()->assertSee('action="'.route('logout').'"', false)->assertSee('Logout');
+    }
+
     public function test_regular_users_can_access_the_customer_dashboard(): void
     {
         $user = User::factory()->create();

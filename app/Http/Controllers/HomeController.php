@@ -3,15 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Home;
+use App\Models\RoomType;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+    public function index()
+    {
+        $featuredRoomTypes = RoomType::where('active', true)->withMin(['rooms' => fn ($q) => $q->active()], 'price')->limit(3)->get();
+
+        return view('home.welcome', compact('featuredRoomTypes'));
+    }
+
     /* Display a listing of the resource.
     */
     public function HomeDashboard()
     {
-        return view('home.welcome');
+        return $this->index();
         //
     }
 

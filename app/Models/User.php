@@ -47,4 +47,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Reservation::class);
     }
+
+    public function preference()
+    {
+        return $this->hasOne(UserPreference::class);
+    }
+
+    public function guestServiceRequests()
+    {
+        return $this->hasMany(GuestServiceRequest::class);
+    }
 }

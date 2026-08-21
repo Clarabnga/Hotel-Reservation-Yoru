@@ -8,6 +8,8 @@
                 <form action="{{route('rooms.store')}}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
+                        <label for="room_type_id" class="form-label">Public Room Type</label><select class="form-select" id="room_type_id" name="room_type_id"><option value="">Legacy / unassigned</option>@foreach($roomTypes as $roomType)<option value="{{ $roomType->id }}">{{ $roomType->name }}</option>@endforeach</select>
+                    </div><div class="mb-3">
                         <label for="number" class="form-label">Number Room</label>
                         <input type="text" class="form-control" id="number" name="number" required>
                     </div>
@@ -48,4 +50,3 @@
     </div>
 </div>
 @endsection
-

@@ -10,6 +10,8 @@
                     @method('PUT') <!-- Fixed method -->
                     
                     <div class="mb-3">
+                        <label for="room_type_id" class="form-label">Public Room Type</label><select class="form-select" id="room_type_id" name="room_type_id"><option value="">Legacy / unassigned</option>@foreach($roomTypes as $roomType)<option value="{{ $roomType->id }}" @selected($room->room_type_id===$roomType->id)>{{ $roomType->name }}</option>@endforeach</select>
+                    </div><div class="mb-3">
                         <label class="form-label">Number Room</label>
                         <input type="text" class="form-control" id="number" name="number" value="{{ $room->number }}" required>
                     </div>

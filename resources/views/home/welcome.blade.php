@@ -1,50 +1,10 @@
 @extends('home.dashboard')
-
 @section('home')
-
-<style>
-    .large-btn {
-        font-size: 20px; /* Ukuran font lebih besar */
-        padding: 15px 50px; /* Padding besar */
-        border-radius: 1px; /* Membuat sudut tombol lebih membulat */
-    }
-</style>
-
-<!-- Hero Section -->
-<div class="position-relative w-100" style="height: 550px;">
-    <img src="{{ asset('assets/images/slide1.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Hero Image">
-    <a href="{{ url('/our-rooms') }}" class="btn btn-light large-btn shadow btn-rounded position-absolute top-50 start-50 translate-middle" data-mdb-ripple-init data-mdb-ripple-color="dark">
-        Book Now
-    </a>
-    
-    
-    
-</div>
-
-<!-- Content Section -->
-<div class="container mt-5">
-    <h3 class="text-center text-light">BATAVIA</h3>
-    <p class="text-center text-light">Elegant Dutch-era architecture, flea markets, and ethnic cuisine</p>
-    
-    <div class="row mt-5 align-items-center">
-        <div class="col-md-6">
-            <img src="{{ asset('assets/images/jkt2.jpg') }}" class="img-fluid rounded" alt="Jakarta">
-        </div>
-        <div class="col-md-6">
-            <h5 class="text-light">Downtown Jakarta is a monument to the future of Indonesia, intriguing and chaotic by turn. 
-                As capital city of a leading economy, its skyline is dappled with the skyscraper homes of banks and corporations.</h5>
-            <p class="text-light">
-                To delve behind this 21st-century façade, however, is to discover the city’s complex heritage. 
-                Feel the pull of Islam in the imposing Istiqlal Mosque, adorned with calligraphy. 
-                Seek out the elegant Dutch colonial buildings of Kota Tua, and admire city panoramas 
-                from the observation deck of the Monas Tower, proud symbol of Indonesian independence in 1945.
-            </p>
-            <p class="text-light">
-                Wooden schooners, pivotal to the spice trade on which Indonesia grew rich, 
-                line up along the quay at Sunda Kelapa Port on Ciliwung River.
-            </p>
-        </div>
-    </div>
-</div>
-
+<section class="hero"><img src="{{ asset('assets/images/slide1.jpg') }}" alt="Yoru Hotel overlooking a tranquil landscape"><div class="hero-wash"></div><div class="shell hero-copy"><p class="eyebrow">Japanese-inspired hospitality</p><h1>Yoru Hotel</h1><p class="hero-lead">A quiet retreat where night<br>becomes serenity.</p><a class="text-link" href="{{ route('about') }}">Discover our story <span>→</span></a></div></section>
+<div class="shell booking-wrap"><form class="booking-bar" method="GET" action="{{ route('our.room') }}"><label><span>Check-in</span><input name="check_in" type="date" min="{{ now()->toDateString() }}" value="{{ now()->addDay()->toDateString() }}" required></label><label><span>Check-out</span><input name="check_out" type="date" min="{{ now()->addDay()->toDateString() }}" value="{{ now()->addDays(2)->toDateString() }}" required></label><label><span>Guests</span><select name="guests"><option value="1">1 Guest</option><option value="2" selected>2 Guests</option><option value="3">3 Guests</option><option value="4">4 Guests</option></select></label><label><span>Room type</span><select name="room_type"><option value="">All room types</option>@foreach($featuredRoomTypes as $type)<option value="{{ $type->slug }}">{{ $type->name }}</option>@endforeach</select></label><button class="button" type="submit">Check availability</button></form></div>
+<section class="section shell"><div class="section-head"><div><p class="eyebrow">Rest well</p><h2>Featured room types</h2></div><a class="text-link" href="{{ route('our.room') }}">View all rooms →</a></div><div class="room-grid home-room-grid">@forelse($featuredRoomTypes as $roomType) @include('home.partials.room-type-card') @empty <div class="empty-state">Our rooms are being prepared. Please return soon.</div> @endforelse</div><div class="home-membership"><div><p class="eyebrow">Yoru recognition</p><h3>Every stay remembers a little more.</h3></div><p>Returning guests earn points from confirmed stays and receive service shaped by their preferences, from room setup to the way we contact them.</p><a class="text-link" href="{{ route('register') }}">Create your Yoru account →</a></div></section>
+<section class="section art-yoru"><div class="shell"><p class="eyebrow">The art of Yoru</p><span>夜</span><h2>A pause between<br>the city and the night.</h2><div><p><b>Stillness</b><br>Space to settle.</p><p><b>Space</b><br>Room to breathe.</p><p><b>Thoughtfulness</b><br>Care in quiet details.</p></div></div></section><section class="section shell"><div class="stay-business"><article><p class="eyebrow">Stay with Yoru</p><h2>Time made entirely your own.</h2><p>Quiet rooms and thoughtful details for personal stays.</p><a class="button button-outline" href="{{ route('our.room') }}">Explore rooms</a></article><article><p class="eyebrow">Business with Yoru</p><h2>Hospitality that works with you.</h2><p>Corporate stays, long stays, groups and focused meetings.</p><a class="button" href="{{ route('business') }}">Business at Yoru</a></article></div></section>
+<section class="section soft-section"><div class="shell split-head"><div><p class="eyebrow">Seasonal moments</p><h2>Special offers</h2></div><a class="text-link" href="{{ route('offers') }}">View all offers →</a></div><div class="shell offer-banner"><div><p class="eyebrow">Early booking</p><h3>Make space for stillness.</h3><p>Plan your stay ahead and enjoy a slower arrival.</p><a class="button button-outline" href="{{ route('offers') }}">Discover offer</a></div></div></section>
+<section class="section shell"><div class="section-head"><div><p class="eyebrow">Time to restore</p><h2>Beyond your room</h2></div><a class="text-link" href="{{ route('facilities') }}">Explore facilities →</a></div><div class="home-facilities"><img loading="lazy" src="{{ asset('assets/images/pool.jpeg') }}" alt="Pool and wellness area at Yoru Hotel"><img loading="lazy" src="{{ asset('assets/images/restaurant.jpg') }}" alt="Restaurant at Yoru Hotel"><div><p class="eyebrow">Move at your pace</p><h3>Wellness, dining and space to gather.</h3><p>Begin with a quiet swim, meet over seasonal dining, or bring a team together in one of our flexible event spaces.</p><a class="text-link" href="{{ route('facilities') }}">See what is available →</a></div></div></section>
+<section class="about-strip"><div class="shell about-grid"><div><p class="eyebrow">About Yoru</p><h2>Hospitality shaped<br>by quiet details.</h2><p>Inspired by Japanese restraint and the calm of night, Yoru makes room for unhurried comfort in the heart of Jakarta.</p><a class="button button-outline" href="{{ route('about') }}">Learn more</a></div><img loading="lazy" src="{{ asset('assets/images/lounge.jpg') }}" alt="A calm lounge at Yoru Hotel"></div></section>
 @endsection

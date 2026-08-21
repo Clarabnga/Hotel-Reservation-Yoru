@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Room;
+use App\Models\RoomType;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +19,7 @@ class RoomController extends Controller
 
     public function create()
     {
-        return view('admin.create');
+        return view('admin.create', ['roomTypes' => RoomType::where('active', true)->orderBy('name')->get()]);
         //
     }
 
@@ -30,6 +30,7 @@ class RoomController extends Controller
     {
         $request->validate([
             'number' => 'required|string|unique:rooms|max:3',
+            'room_type_id' => ['nullable', 'exists:room_types,id'],
             'type' => 'required|string',
             'price' => 'required|integer|min:0',
             'facilities' => 'required|string|max:5000',
@@ -39,9 +40,11 @@ class RoomController extends Controller
 
         $imagePath = $request->file('image')?->store('rooms', 'public');
 
+        $roomType = $request->filled('room_type_id') ? RoomType::findOrFail($request->integer('room_type_id')) : null;
         Room::create([
+            'room_type_id' => $roomType?->id,
             'number' => $request->number,
-            'type' => $request->type,
+            'type' => $roomType?->name ?? $request->type,
             'price' => $request->price,
             'facilities' => $request->facilities,
             'status' => 'available',
@@ -59,7 +62,7 @@ class RoomController extends Controller
     {
         $room = Room::findOrFail($id);
 
-        return view('admin.edit', compact('room'));
+        return $this->edit($room);
         //
     }
 
@@ -68,7 +71,9 @@ class RoomController extends Controller
      */
     public function edit(Room $room)
     {
-        return view('admin.edit', compact('room'));
+        $roomTypes = RoomType::where('active', true)->orderBy('name')->get();
+
+        return view('admin.edit', compact('room', 'roomTypes'));
         //
     }
 
@@ -79,6 +84,7 @@ class RoomController extends Controller
     {
         $request->validate([
             'number' => ['required', 'string', 'max:3', Rule::unique('rooms', 'number')->ignore($room->id)],
+            'room_type_id' => ['nullable', 'exists:room_types,id'],
             'type' => ['required', 'string', 'max:255'],
             'price' => ['required', 'integer', 'min:0'],
             'facilities' => ['required', 'string', 'max:5000'],
@@ -86,7 +92,8 @@ class RoomController extends Controller
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
         ]);
 
-        $room->update($request->only(['number', 'type', 'price', 'facilities', 'operational_status']));
+        $roomType = $request->filled('room_type_id') ? RoomType::findOrFail($request->integer('room_type_id')) : null;
+        $room->update($request->only(['number', 'type', 'price', 'facilities', 'operational_status']) + ['room_type_id' => $roomType?->id, 'type' => $roomType?->name ?? $request->type]);
 
         if ($request->hasFile('image')) {
             $this->deleteManagedImage($room->image);
@@ -111,17 +118,33 @@ class RoomController extends Controller
         //
     }
 
-    public function OurRooms()
+    public function OurRooms(Request $request)
     {
-        $rooms = Room::active()->select('id', 'facilities', 'type', 'image', 'price')
-            ->whereIn('id', function ($query) {
-                $query->select(DB::raw('MIN(id)'))
-                    ->from('rooms')
-                    ->groupBy('type');
-            })
-            ->get();
+        $validated = $request->validate([
+            'check_in' => ['nullable', 'date', 'after_or_equal:today'],
+            'check_out' => ['nullable', 'date', 'after:check_in'],
+            'guests' => ['nullable', 'integer', 'min:1', 'max:8'],
+            'room_type' => ['nullable', 'string', 'max:100'],
+        ]);
 
-        return view('home.rooms', compact('rooms'));
+        $rooms = RoomType::where('active', true)
+            ->withMin(['rooms' => fn ($q) => $q->active()], 'price')
+            ->when($validated['room_type'] ?? null, fn ($query, $type) => $query->where('slug', $type))
+            ->when(($validated['check_in'] ?? null) && ($validated['check_out'] ?? null), fn ($query) => $query->whereHas('rooms', fn ($rooms) => $rooms->active()->whereDoesntHave('reservations', fn ($reservations) => $reservations->where('status', '!=', 'cancelled')->where('check_in', '<', $validated['check_out'])->where('check_out', '>', $validated['check_in']))))
+            ->orderBy('name')->paginate(9)->withQueryString();
+
+        $roomTypes = RoomType::where('active', true)->orderBy('name')->get(['name', 'slug']);
+
+        return view('home.rooms', compact('rooms', 'roomTypes'));
+    }
+
+    public function publicShow(RoomType $roomType)
+    {
+        abort_unless($roomType->active, 404);
+        $roomType->loadMin(['rooms' => fn ($q) => $q->active()], 'price');
+        $bookableRoom = $roomType->rooms()->active()->orderBy('id')->first();
+
+        return view('home.room-detail', compact('roomType', 'bookableRoom'));
     }
 
     private function deleteManagedImage(?string $image): void

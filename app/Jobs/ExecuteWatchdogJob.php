@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Contracts\HandlesWatchdogPayload;
 use App\Models\PriorityQueue;
 use App\Services\WatchdogScheduler;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -35,6 +36,13 @@ class ExecuteWatchdogJob implements ShouldBeUnique, ShouldQueue
 
         try {
             $reflection = new ReflectionClass($job->job_class);
+            if ($reflection->implementsInterface(HandlesWatchdogPayload::class)) {
+                app()->call([$reflection->newInstance(), 'handle'], ['payload' => $job->payload]);
+                $scheduler->markCompleted($job);
+
+                return;
+            }
+
             $arguments = [];
             foreach ($reflection->getConstructor()?->getParameters() ?? [] as $parameter) {
                 $type = $parameter->getType();
