@@ -16,9 +16,37 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        $eligibleReservations = $user->reservations()
+            ->whereIn('status', ['confirmed', 'completed']);
+        $eligibleSpend = (int) (clone $eligibleReservations)->sum('total_price');
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'loyaltyPoints' => intdiv($eligibleSpend, 10000),
+            'eligibleSpend' => $eligibleSpend,
+            'completedStays' => (clone $eligibleReservations)->where('status', 'completed')->count(),
+            'upcomingStays' => $user->reservations()
+                ->whereIn('status', ['pending', 'confirmed'])
+                ->whereDate('check_out', '>=', now())
+                ->count(),
+            'totalReservations' => $user->reservations()->count(),
+            'nextReservation' => $user->reservations()->with('room')->whereIn('status', ['pending', 'confirmed'])->whereDate('check_out', '>=', now())->orderBy('check_in')->first(),
+            'preference' => $user->preference()->firstOrNew(),
         ]);
+    }
+
+    public function updatePreferences(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'bed_type' => ['nullable', 'in:king,twin,no_preference'], 'smoking' => ['nullable', 'in:non_smoking,smoking,no_preference'],
+            'floor' => ['nullable', 'in:high,low,no_preference'], 'dietary' => ['nullable', 'string', 'max:255'],
+            'airport_transfer' => ['nullable', 'boolean'], 'contact_method' => ['nullable', 'in:email,phone,whatsapp'],
+            'accessibility_notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+        $request->user()->preference()->updateOrCreate([], $data + ['airport_transfer' => $request->boolean('airport_transfer')]);
+
+        return Redirect::route('profile.edit')->with('status', 'preferences-updated');
     }
 
     /**

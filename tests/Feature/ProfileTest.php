@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Reservation;
+use App\Models\Room;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -19,6 +21,44 @@ class ProfileTest extends TestCase
             ->get('/profile');
 
         $response->assertOk();
+    }
+
+    public function test_profile_page_supports_legacy_users_without_a_joined_date(): void
+    {
+        $user = User::factory()->create();
+        $user->timestamps = false;
+        $user->forceFill(['created_at' => null, 'updated_at' => null])->save();
+
+        $this->actingAs($user)
+            ->get('/profile')
+            ->assertOk()
+            ->assertSee('Yoru Guest');
+    }
+
+    public function test_profile_displays_points_from_confirmed_and_completed_stays_only(): void
+    {
+        $user = User::factory()->create();
+        $room = Room::factory()->create();
+
+        foreach ([['confirmed', 250000], ['completed', 150000], ['pending', 900000], ['cancelled', 900000]] as [$status, $total]) {
+            Reservation::create([
+                'user_id' => $user->id,
+                'room_id' => $room->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => '081234567890',
+                'check_in' => now()->addDay()->toDateString(),
+                'check_out' => now()->addDays(2)->toDateString(),
+                'total_price' => $total,
+                'status' => $status,
+            ]);
+        }
+
+        $this->actingAs($user)
+            ->get('/profile')
+            ->assertOk()
+            ->assertSee('40')
+            ->assertSee('points');
     }
 
     public function test_profile_information_can_be_updated(): void

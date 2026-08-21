@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RoomSeeder::class);
 
         User::factory(30)->create();
-        Room::factory(150)->create();
+        // RoomSeeder owns physical inventory so every room has a public room type.
 
         // User::factory()->create([
         //     'name' => 'Test User',
