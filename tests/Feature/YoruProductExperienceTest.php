@@ -11,6 +11,13 @@ class YoruProductExperienceTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_health_check_is_public_and_safe(): void
+    {
+        $this->get('/health')
+            ->assertOk()
+            ->assertExactJson(['status' => 'ok']);
+    }
+
     public function test_public_hotel_pages_and_branded_not_found_page_render(): void
     {
         Room::factory()->create(['type' => 'Yoru Suite']);

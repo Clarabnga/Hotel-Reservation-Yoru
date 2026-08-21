@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/health', fn () => response()->json(['status' => 'ok']))->name('health');
 Route::redirect('/home/facilities', '/facilities');
 Route::view('/facilities', 'home.facilities')->name('facilities');
 Route::view('/offers', 'home.offers')->name('offers');

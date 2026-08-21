@@ -6,7 +6,7 @@ Public room products are modeled as `RoomType` records backed by physical `Room`
 
 ## Local development
 
-Requires PHP 8.2+ (production target: 8.5), Composer, Node.js 22+, npm, and SQLite.
+Requires PHP 8.2+ (Docker production target: 8.3), Composer, Node.js 22+, npm, and SQLite.
 
 ```bash
 composer install
@@ -47,3 +47,5 @@ vendor/bin/pint --test app routes database tests
 ```
 
 See [Production infrastructure](docs/production-infrastructure.md) for PostgreSQL, Redis, queues, scheduler, mail, CI, environment variables, and the separate concurrency test.
+
+See [Render Free Docker deployment](docs/render-deployment.md) for the Supabase-backed demo deployment settings, migrations, health checks, Watchdog constraints, and upload persistence limitations.

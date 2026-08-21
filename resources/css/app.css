@@ -58,3 +58,5 @@
 }
 @media(max-width:800px){.home-room-grid{grid-template-columns:repeat(2,1fr)}.home-membership,.home-facilities{grid-template-columns:1fr 1fr}.home-membership>a,.home-facilities>div{grid-column:1/-1}.home-facilities>div{padding:30px}.home-facilities img{height:280px}}
 @media(max-width:560px){.home-room-grid,.home-membership,.home-facilities{grid-template-columns:1fr}.home-membership>a{grid-column:auto}.home-facilities>div{grid-column:auto}.home-facilities img{height:240px}}
+
+@layer components{.room-image,.room-detail-image{position:relative}.room-image>span,.room-detail-image>span{position:absolute;inset:0;display:grid;place-items:center}.room-image>img,.room-detail-image>img{position:relative;z-index:1}}
